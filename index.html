@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧬 選科智能羅盤 2026 | 生物資訊學 vs 藥劑學</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@300;400;500;700;900&display=swap');
+
+:root{
+  --bio:#6C63FF;--bio2:#918AFF;--bio-l:#EEEDFF;
+  --pha:#FF6584;--pha2:#FF8FA3;--pha-l:#FFF0F3;
+  --grn:#10B981;--grn-l:#ECFDF5;
+  --amb:#F59E0B;--amb-l:#FFFBEB;
+  --sky:#0EA5E9;--sky-l:#F0F9FF;
+  --bg:#F4F2FF;--card:#FFFFFF;
+  --border:#E8E5F5;--shadow:0 8px 32px rgba(108,99,255,.10);
+  --text:#2D2B55;--muted:#8886AC;
+  --radius:24px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans HK',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+.bg-deco{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.18;animation:bfloat 10s ease-in-out infinite}
+.b1{width:420px;height:420px;background:var(--bio);top:-120px;left:-80px}
+.b2{width:360px;height:360px;background:var(--pha);bottom:-100px;right:-80px;animation-delay:3s}
+.b3{width:280px;height:280px;background:var(--grn);top:45%;left:55%;animation-delay:5s}
+.b4{width:240px;height:240px;background:var(--sky);top:20%;right:10%;animation-delay:7s}
+@keyframes bfloat{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-20px) scale(1.06)}}
+
+.wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:20px 16px 80px}
+
+/* HEADER */
+.hdr{text-align:center;padding:44px 0 32px;animation:fadeD .7s ease}
+.hdr-pills{display:flex;justify-content:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:700;letter-spacing:.4px}
+.pill-b{background:var(--bio-l);color:var(--bio);border:1.5px solid rgba(108,99,255,.25)}
+.pill-p{background:var(--pha-l);color:var(--pha);border:1.5px solid rgba(255,101,132,.25)}
+.hdr h1{font-size:clamp(22px,5vw,30px);font-weight:900;line-height:1.3;margin-bottom:8px}
+.hdr h1 span{background:linear-gradient(135deg,var(--bio),var(--pha));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr>p{color:var(--muted);font-size:14px}
+.pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--grn);margin-right:5px;box-shadow:0 0 0 0 rgba(16,185,129,.45);animation:pls 2s infinite}
+@keyframes pls{0%{box-shadow:0 0 0 0 rgba(16,185,129,.45)}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:36px 30px;margin-bottom:20px;border:1px solid var(--border);animation:slideU .5s cubic-bezier(.4,0,.2,1)}
+@media(max-width:480px){.card{padding:24px 16px}}
+@keyframes slideU{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeD{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{from{transform:scale(0) rotate(-10deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+
+/* STEP DOTS */
+.steps{display:flex;justify-content:center;align-items:center;gap:4px;margin-bottom:22px;flex-wrap:wrap}
+.sdot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;border:2.5px solid var(--border);color:var(--muted);transition:all .35s;flex-shrink:0}
+.sdot.done{background:var(--bio);border-color:var(--bio);color:#fff}
+.sdot.active{background:linear-gradient(135deg,var(--bio),var(--pha));border-color:transparent;color:#fff;box-shadow:0 0 14px rgba(108,99,255,.4);transform:scale(1.18)}
+.sline{width:14px;height:2.5px;background:var(--border);border-radius:2px;transition:background .35s}
+.sline.done{background:var(--bio)}
+
+/* PROGRESS */
+.prog-w{height:8px;background:#EEECFA;border-radius:50px;margin-bottom:28px;overflow:hidden}
+.prog-f{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--bio),var(--grn));transition:width .6s cubic-bezier(.4,0,.2,1)}
+.prog-label{text-align:center;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px}
+
+/* Q CHIP */
+.qchip{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:14px}
+.qc-n{background:#F0EEFF;color:var(--bio);border:1px solid rgba(108,99,255,.2)}
+.qc-ai{background:var(--amb-l);color:var(--amb);border:1px solid rgba(245,158,11,.25)}
+.qc-intl{background:var(--sky-l);color:var(--sky);border:1px solid rgba(14,165,233,.25)}
+.q-icon{font-size:44px;display:block;margin-bottom:10px}
+.q-title{font-size:20px;font-weight:900;line-height:1.4;margin-bottom:6px}
+.q-sub{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:26px}
+
+/* OPTIONS */
+.opts{display:flex;flex-direction:column;gap:11px}
+.opts-2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:500px){.opts-2{grid-template-columns:1fr}}
+
+.ob{position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border-radius:18px;border:2.5px solid var(--border);background:#fff;cursor:pointer;text-align:left;transition:all .28s cubic-bezier(.4,0,.2,1);width:100%}
+.ob:hover{border-color:var(--bio);background:var(--bio-l);transform:translateX(4px);box-shadow:0 4px 16px rgba(108,99,255,.10)}
+.ob.sb{border-color:var(--bio);background:var(--bio-l);box-shadow:0 4px 18px rgba(108,99,255,.15)}
+.ob.sp{border-color:var(--pha);background:var(--pha-l);box-shadow:0 4px 18px rgba(255,101,132,.15)}
+.ob.sn{border-color:var(--grn);background:var(--grn-l);box-shadow:0 4px 18px rgba(16,185,129,.12)}
+.ob.si{border-color:var(--sky);background:var(--sky-l);box-shadow:0 4px 18px rgba(14,165,233,.12)}
+
+.ock{width:22px;height:22px;min-width:22px;border-radius:50%;border:2.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-top:1px;transition:all .3s;flex-shrink:0;color:transparent}
+.sb .ock{background:var(--bio);border-color:var(--bio);color:#fff}
+.sp .ock{background:var(--pha);border-color:var(--pha);color:#fff}
+.sn .ock{background:var(--grn);border-color:var(--grn);color:#fff}
+.si .ock{background:var(--sky);border-color:var(--sky);color:#fff}
+.oem{font-size:28px;flex-shrink:0;margin-top:1px}
+.otit{font-size:14px;font-weight:800;margin-bottom:3px}
+.odesc{font-size:12px;color:var(--muted);line-height:1.55}
+.otag{display:inline-block;margin-top:6px;padding:2px 9px;border-radius:50px;font-size:10px;font-weight:700}
+.tb{background:var(--bio-l);color:var(--bio)}.tp{background:var(--pha-l);color:var(--pha)}.tn{background:#F0F0F8;color:var(--muted)}.ti{background:var(--sky-l);color:var(--sky)}.tg{background:var(--grn-l);color:var(--grn)}
+
+/* NAV */
+.nav{display:flex;gap:12px;margin-top:28px}
+.nbk{padding:13px 22px;border-radius:50px;border:2.5px solid var(--border);background:#fff;color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;font-family:inherit}
+.nbk:hover{border-color:var(--bio);color:var(--bio)}
+.nxt{flex:1;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--bio),var(--grn));color:#fff;font-size:15px;font-weight:900;cursor:pointer;transition:all .28s;font-family:inherit;opacity:.35;pointer-events:none;box-shadow:0 6px 22px rgba(108,99,255,.25)}
+.nxt.on{opacity:1;pointer-events:auto}
+.nxt.on:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(108,99,255,.35)}
+
+/* INTRO */
+.intro-em{font-size:76px;display:block;text-align:center;margin-bottom:14px;animation:bounce 2.5s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.intro-t{font-size:24px;font-weight:900;text-align:center;margin-bottom:10px}
+.intro-d{font-size:14px;color:var(--muted);text-align:center;line-height:1.8;margin-bottom:24px}
+
+.ckl{background:var(--bio-l);border:1.5px solid rgba(108,99,255,.18);border-radius:18px;padding:22px;margin-bottom:18px}
+.ckl h3{font-size:12px;font-weight:700;color:var(--bio);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+.ckl li{list-style:none;display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--text);margin-bottom:9px;line-height:1.55}
+
+.pb{border-radius:14px;padding:14px 18px;margin-bottom:12px;display:flex;gap:12px;align-items:flex-start}
+.pb-g{background:var(--grn-l);border:1.5px solid rgba(16,185,129,.2)}
+.pb-s{background:var(--sky-l);border:1.5px solid rgba(14,165,233,.2)}
+.pb-a{background:var(--amb-l);border:1.5px solid rgba(245,158,11,.2)}
+.pb-i{font-size:20px;flex-shrink:0}
+.pb-t{font-size:12px;line-height:1.6}
+.pb-g .pb-t{color:#047857}.pb-s .pb-t{color:#0369A1}.pb-a .pb-t{color:#B45309}
+.pb-t strong{font-weight:800}
+
+.btn-s{display:block;width:100%;padding:16px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--bio),var(--grn));color:#fff;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .3s;box-shadow:0 8px 28px rgba(108,99,255,.3)}
+.btn-s:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(108,99,255,.4)}
+
+/* RESULT */
+.rhero{text-align:center;padding:28px 16px 24px;border-bottom:1.5px solid var(--border);margin-bottom:28px}
+.rem{font-size:80px;display:block;margin-bottom:12px;animation:pop .6s .2s both}
+.rlbl{display:inline-block;padding:5px 16px;border-radius:50px;font-size:12px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin-bottom:12px}
+.rl-b{background:var(--bio-l);color:var(--bio);border:1.5px solid rgba(108,99,255,.3)}
+.rl-p{background:var(--pha-l);color:var(--pha);border:1.5px solid rgba(255,101,132,.3)}
+.rl-t{background:var(--amb-l);color:var(--amb);border:1.5px solid rgba(245,158,11,.3)}
+.rtit{font-size:clamp(22px,5vw,30px);font-weight:900;line-height:1.3;margin-bottom:10px}
+.rt-b{color:var(--bio)}.rt-p{color:var(--pha)}.rt-t{color:var(--amb)}
+.rdesc{font-size:14px;color:var(--muted);line-height:1.85;max-width:560px;margin:0 auto}
+
+.slbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.divider{height:1.5px;background:var(--border);margin:26px 0}
+
+/* SCORE BARS */
+.srow{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+.slb{font-size:13px;font-weight:700;width:96px;flex-shrink:0}
+.strk{flex:1;height:11px;background:#F0EEFF;border-radius:50px;overflow:hidden}
+.sfil{height:100%;border-radius:50px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.sf-b{background:linear-gradient(90deg,var(--bio),var(--bio2))}.sf-p{background:linear-gradient(90deg,var(--pha),var(--pha2))}
+.snum{font-size:13px;font-weight:900;width:38px;text-align:right;flex-shrink:0}
+
+/* RADAR */
+.radar-sec{margin:28px 0;text-align:center}
+.radar-legend{display:flex;gap:18px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--muted)}
+.ldot{width:10px;height:10px;border-radius:50%}
+
+/* DIM GRID */
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin:18px 0}
+.ditem{padding:14px;border-radius:16px;background:#FAFAFF;border:1.5px solid var(--border)}
+.di-i{font-size:22px;margin-bottom:6px}
+.di-l{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.di-v{font-size:13px;font-weight:800}
+
+/* SPECIAL RINGS */
+.spgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+@media(max-width:600px){.spgrid{grid-template-columns:1fr 1fr}}
+.spcard{padding:16px 10px;border-radius:18px;text-align:center;background:#FAFAFF;border:1.5px solid var(--border)}
+.sp-i{font-size:26px;margin-bottom:6px}
+.sp-l{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-bottom:10px}
+.sp-ring{position:relative;width:60px;height:60px;margin:0 auto 8px}
+.sp-ring svg{transform:rotate(-90deg)}
+.sr-bg{fill:none;stroke:#EEECFA;stroke-width:6}
+.sr-f{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dasharray 1.5s cubic-bezier(.4,0,.2,1)}
+.sr-txt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;font-weight:900}
+.sp-note{font-size:11px;color:var(--muted);line-height:1.4}
+
+/* PRO/CON */
+.pcgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+@media(max-width:500px){.pcgrid{grid-template-columns:1fr}}
+.pbox,.cbox{padding:18px;border-radius:18px}
+.pbox{background:#F0FFF8;border:1.5px solid #BBF7D0}
+.cbox{background:#FFFBEB;border:1.5px solid #FDE68A}
+.pbox h4{color:#16A34A;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px}
+.cbox h4{color:#B45309;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px}
+.pbox li,.cbox li{list-style:none;display:flex;gap:7px;align-items:flex-start;font-size:12px;color:var(--text);line-height:1.55;margin-bottom:7px}
+
+/* BANNERS */
+.banner-card{border-radius:20px;padding:22px;margin:18px 0}
+.bc-gba{background:linear-gradient(135deg,#ECFDF5,#F0F9FF);border:1.5px solid rgba(16,185,129,.2)}
+.bc-intl{background:linear-gradient(135deg,#F0F9FF,#EEF0FF);border:1.5px solid rgba(14,165,233,.2)}
+.bc-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.bc-head h3{font-size:15px;font-weight:800}
+.bc-gba .bc-head h3{color:#059669}.bc-intl .bc-head h3{color:#0284C7}
+.bc-body{font-size:13px;color:#64748B;line-height:1.8}
+.bc-body strong{color:var(--text)}
+.bc-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.bctag{padding:3px 11px;border-radius:50px;font-size:11px;font-weight:700}
+.bctag-g{background:rgba(16,185,129,.12);color:#059669;border:1px solid rgba(16,185,129,.2)}
+.bctag-s{background:rgba(14,165,233,.12);color:#0284C7;border:1px solid rgba(14,165,233,.2)}
+
+/* WORLD MAP */
+.world-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.world-item{flex:1;min-width:118px;padding:12px;border-radius:14px;background:#fff;border:1.5px solid var(--border);text-align:center}
+.wi-flag{font-size:24px;margin-bottom:4px}
+.wi-city{font-size:12px;font-weight:800;color:var(--text)}
+.wi-role{font-size:10px;color:var(--muted);margin-top:2px}
+.wi-sal{font-size:11px;font-weight:700;color:var(--bio);margin-top:4px}
+
+/* SALARY TABLE */
+.sal-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+.sal-table th{background:var(--bio-l);color:var(--bio);font-weight:800;padding:10px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+.sal-table td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.sal-table tr:last-child td{border-bottom:none}
+.sal-table tr:hover td{background:#FAFAFF}
+.sal-badge{display:inline-block;padding:2px 8px;border-radius:50px;font-size:10px;font-weight:700}
+.sb-g{background:var(--grn-l);color:var(--grn)}.sb-b{background:var(--bio-l);color:var(--bio)}.sb-p{background:var(--pha-l);color:var(--pha)}
+
+/* ROADMAP */
+.road-steps{display:flex;flex-direction:column}
+.rstep{display:flex;gap:16px;padding-bottom:22px;position:relative}
+.rstep:last-child{padding-bottom:0}
+.rstep:not(:last-child)::before{content:'';position:absolute;left:20px;top:44px;width:2.5px;bottom:0;background:var(--border)}
+.rdot{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;z-index:1}
+.rd-b{background:var(--bio-l);border:2px solid rgba(108,99,255,.3)}
+.rd-p{background:var(--pha-l);border:2px solid rgba(255,101,132,.3)}
+.rd-g{background:var(--grn-l);border:2px solid rgba(16,185,129,.3)}
+.rd-s{background:var(--sky-l);border:2px solid rgba(14,165,233,.3)}
+.rcont{padding-top:6px}
+.ry{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.rd{font-size:14px;font-weight:800;color:var(--text)}
+.rs{font-size:12px;font-weight:700;color:var(--bio);margin-top:3px}
+
+.rnote{background:#FAFAFF;border:1.5px dashed var(--border);border-radius:16px;padding:18px;font-size:13px;color:var(--muted);line-height:1.8;margin-top:18px}
+.rnote strong{color:var(--text)}
+.data-note{background:var(--amb-l);border:1.5px solid rgba(245,158,11,.2);border-radius:12px;padding:12px 16px;font-size:11px;color:#92400E;line-height:1.6;margin-top:14px}
+.btn-r{display:block;width:100%;padding:14px;border-radius:50px;border:2.5px solid var(--border);background:#fff;color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .25s;margin-top:18px;text-align:center}
+.btn-r:hover{border-color:var(--bio);color:var(--bio)}
+.share-row{display:flex;gap:10px;margin:16px 0;flex-wrap:wrap}
+.share-btn{flex:1;min-width:120px;padding:12px;border-radius:14px;border:1.5px solid var(--border);background:#fff;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:5px}
+.share-btn:hover{border-color:var(--bio);color:var(--bio);background:var(--bio-l)}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="bg-deco">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="blob b3"></div><div class="blob b4"></div>
+</div>
+
+<div class="wrap">
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-pills">
+      <span class="pill pill-b">🧬 生物資訊學</span>
+      <span style="color:var(--muted);font-size:16px;font-weight:900">VS</span>
+      <span class="pill pill-p">💊 藥劑學</span>
+    </div>
+    <h1>選科<span>智能羅盤</span> 2026</h1>
+    <p><span class="pulse"></span>已整合最新香港政策、核實薪酬數據及國際機遇</p>
+  </div>
+
+  <!-- INTRO -->
+  <div id="intro" class="card">
+    <span class="intro-em">🧭</span>
+    <div class="intro-t">你好！我係你嘅 AI 選科顧問 ✨</div>
+    <div class="intro-d">回答 <strong>10 個問題</strong>，結合 <strong>2026 最新政策與國際機遇</strong>，為你度身推薦最適合嘅學科！</div>
+
+    <div class="pb pb-p" style="background:var(--pha-l);border:1.5px solid rgba(255,101,132,.2)">
+      <span class="pb-i">💊</span>
+      <div class="pb-t" style="color:#9D174D"><strong>【已核實】藥劑師薪酬</strong>：衞生署藥劑師起薪 HK$61,865/月（總薪級表第27點），醫管局藥劑師起薪約 $56,450/月，管理層可達 $179,425/月。</div>
+    </div>
+    <div class="pb pb-g">
+      <span class="pb-i">🧬</span>
+      <div class="pb-t"><strong>【已核實】生物資訊薪酬</strong>：初級（1-3年）年薪約 HK$428,000（月薪~$35,700），資深科學家（10年以上）年薪達 HK$107萬。</div>
+    </div>
+    <div class="pb pb-g">
+      <span class="pb-i">🏗️</span>
+      <div class="pb-t"><strong>河套香港園區</strong>：已有超過 60 家企業進駐，生命健康科技與 AI 為核心產業，生物資訊人才需求急增。</div>
+    </div>
+    <div class="pb pb-s">
+      <span class="pb-i">🌍</span>
+      <div class="pb-t"><strong>全球 Biotech 浪潮</strong>：波士頓、倫敦、新加坡、巴塞爾等科研中心對生物資訊專家需求爆發，2025 年生物科技行業 M&A 創下三年最高紀錄。</div>
+    </div>
+    <div class="pb pb-a">
+      <span class="pb-i">🏥</span>
+      <div class="pb-t"><strong>社區藥房計劃</strong>：香港《基層醫療健康藍圖》計劃於 2026 年第四季推出，大幅擴大社區藥劑師角色。</div>
+    </div>
+
+    <div class="ckl">
+      <h3>📋 10 個分析維度</h3>
+      <li>🌟 <span><strong>性格類型</strong> — 穩健型 or 探索型？</span></li>
+      <li>💼 <span><strong>工作偏好</strong> — 面對病人 or 面對數據？</span></li>
+      <li>📚 <span><strong>學科強項</strong> — 生化 or 數理電腦？</span></li>
+      <li>🎓 <span><strong>進修意願</strong> — 立即工作 or 願讀博士？</span></li>
+      <li>💰 <span><strong>薪酬期望</strong> — 即時高薪 or 長線爆發？</span></li>
+      <li>⏰ <span><strong>時間成本</strong> — 先苦後甜 or 即時回報？</span></li>
+      <li>🔭 <span><strong>未來方向</strong> — 臨床執業 or 科技研發？</span></li>
+      <li>🤖 <span><strong>AI 衝擊態度</strong> — 與 AI 共處嘅方式？</span></li>
+      <li>🌏 <span><strong>發展視野</strong> — 香港、大灣區 or 全球舞台？</span></li>
+      <li>🚀 <span><strong>創業精神</strong> — 穩定打工族 or 創辦人？</span></li>
+    </div>
+    <button class="btn-s" onclick="startQuiz()">開始智能分析 →（約 3 分鐘）</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="hidden">
+    <div class="steps" id="sDots"></div>
+    <div class="prog-label" id="pLbl">問題 1 / 10</div>
+    <div class="prog-w"><div class="prog-f" id="pFill" style="width:0%"></div></div>
+    <div id="qBox"></div>
+    <div class="nav">
+      <button class="nbk" id="bkBtn" onclick="prevQ()">← 返回</button>
+      <button class="nxt" id="nxBtn" onclick="nextQ()">下一題 →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" class="hidden card"></div>
+</div>
+
+<script>
+/* ════ QUESTIONS ════ */
+const QS=[
+{icon:'🌟',chip:'性格維度',cs:'qc-n',lay:'2',
+ title:'你最能形容自己的性格是哪一種？',
+ sub:'揀最貼近你平時做事風格嘅選項',
+ opts:[
+  {e:'🛡️',t:'穩健守護型',d:'鍾意有清晰路線，工作有保障，討厭不確定性。安全感大於刺激感。',tag:'藥劑師特質',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
+  {e:'🚀',t:'開拓探索型',d:'享受面對未知、接受失敗再試。「揾到答案」令我最有成就感。',tag:'科研人才特質',tc:'tb',s:{b:3,p:0,g:1,ai:1,en:2,it:2}}
+]},
+{icon:'💼',chip:'工作偏好',cs:'qc-n',lay:'1',
+ title:'你更喜歡哪一種工作場景？',
+ sub:'想像自己每天返工係做緊乜',
+ opts:[
+  {e:'🏥',t:'面對病人，直接服務',d:'幫助到病人、見到佢地好返有成就感。鍾意臨床環境同人際互動。',tag:'→ 藥劑學',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
+  {e:'💻',t:'面對電腦，破解數據',d:'對住屏幕分析複雜問題。鍾意寫程式、邏輯推理同大數據。',tag:'→ 生物資訊學',tc:'tb',s:{b:3,p:0,g:1,ai:2,en:1,it:2}},
+  {e:'🔬',t:'兩者皆可，鍾意實驗室',d:'喜歡動手做實驗，同時分析數據，唔介意兩種環境。',tag:'→ 兩者均可',tc:'tn',s:{b:1,p:1,g:1,ai:1,en:1,it:1}}
+]},
+{icon:'📚',chip:'學科強項',cs:'qc-n',lay:'1',
+ title:'以下哪類科目係你的強項？',
+ sub:'誠實回答，揀你係學校真係叻嘅那類',
+ opts:[
+  {e:'🧪',t:'生物 / 化學型',d:'生物化學成績特別好，鍾意記憶分子結構、反應原理同生命科學。',tag:'→ 藥劑學優勢',tc:'tp',s:{b:1,p:3,g:0,ai:0,en:0,it:0}},
+  {e:'🖥️',t:'數學 / 電腦型',d:'Maths 係強項，喜歡邏輯、算法，有自學過 Python / R。',tag:'→ 生物資訊學優勢',tc:'tb',s:{b:3,p:1,g:1,ai:2,en:1,it:2}},
+  {e:'⚖️',t:'兩者平均',d:'生化同數理都 OK，冇特別偏科，兩邊都有興趣。',tag:'→ 兩者均可',tc:'tn',s:{b:2,p:2,g:1,ai:1,en:1,it:1}}
+]},
+{icon:'🎓',chip:'進修意願',cs:'qc-n',lay:'1',
+ title:'本科畢業後，你願意繼續進修幾耐？',
+ sub:'呢個係決定長線錢途嘅最關鍵問題',
+ opts:[
+  {e:'🏃',t:'唔想讀，立即工作',d:'本科 4 年已足夠，想盡快入職場，家庭需要我盡快賺錢。',tag:'→ 藥劑學最合適',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:1,it:0}},
+  {e:'📖',t:'願讀 1-2 年碩士',d:'讀個 Master 可以接受，想快啲將技術轉化為收入。',tag:'→ 兩者皆可',tc:'tn',s:{b:2,p:2,g:1,ai:1,en:1,it:1}},
+  {e:'🔭',t:'願讀 4-6 年博士',d:'長線投資，讀 PhD 唔係問題。明白讀博有津貼，願意成為頂尖專家。',tag:'→ 生物資訊學爆發',tc:'tb',s:{b:3,p:0,g:2,ai:2,en:2,it:2}}
+]},
+{icon:'💰',chip:'薪酬期望',cs:'qc-n',lay:'1',
+ title:'你對薪酬的最大期望是？',
+ sub:'誠實揀，冇對錯之分',
+ opts:[
+  {e:'💎',t:'起點要高，穩中求勝',d:'25 歲起薪要達 HK$55,000+，唔需要最高但要夠穩定，年年加薪。',tag:'→ 衞生署藥劑師 $61,865 起',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
+  {e:'📈',t:'接受先低後高，衝極高天花板',d:'初期可以低啲（~$35k），但要有機會衝上年薪百萬甚至更高。願意博一搏。',tag:'→ 生物資訊資深科學家年薪 $100萬+',tc:'tb',s:{b:3,p:0,g:2,ai:2,en:2,it:2}},
+  {e:'🎯',t:'穩中有增長，兩者平衡',d:'起點中上，同時要有升職空間，唔想被薪級表封死。',tag:'→ 兩者均可',tc:'tn',s:{b:2,p:2,g:1,ai:1,en:1,it:1}}
+]},
+{icon:'⏰',chip:'時間成本',cs:'qc-n',lay:'1',
+ title:'你係「先苦後甜」定「即時回報」型？',
+ sub:'考慮家庭的實際財務狀況',
+ opts:[
+  {e:'⚡',t:'即時回報 — 盡快賺錢',d:'家庭環境唔允許多讀書，或者我需要盡快財務獨立。',tag:'→ 藥劑學 第5年月薪$55k+',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
+  {e:'🌱',t:'先苦後甜 — 投資未來',d:'家裡支持多讀幾年，明白讀 PhD 有津貼（$18,500-$28,400/月），係長線投資。',tag:'→ 生物資訊學高天花板',tc:'tb',s:{b:3,p:0,g:2,ai:2,en:2,it:2}},
+  {e:'🤔',t:'視乎情況 — 有 Funding 先讀',d:'拿到獎學金才繼續讀，否則傾向快點工作。',tag:'→ 視乎機遇',tc:'tn',s:{b:2,p:2,g:1,ai:1,en:1,it:1}}
+]},
+{icon:'🔭',chip:'未來方向',cs:'qc-n',lay:'1',
+ title:'你最嚮往的未來是？',
+ sub:'唔需要考慮現實，揀最令你興奮的',
+ opts:[
+  {e:'🩺',t:'成為受人尊重嘅臨床專業人士',d:'持有專業牌照，在香港醫療體系有法定地位，服務社會，安穩有尊嚴。',tag:'→ 藥劑師路徑',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
+  {e:'🧬',t:'用 AI 改變未來醫療，揚名國際',d:'在基因工程、AI 藥物研發領域，係國際舞台發表研究，讓世界聽到我嘅名字。',tag:'→ 生物資訊學路徑',tc:'tb',s:{b:3,p:0,g:2,ai:2,en:2,it:3}},
+  {e:'🏭',t:'在大藥廠推動新藥面世',d:'跨國藥廠推動新藥，參與臨床研究或法規審批（RA），結合臨床同商業。',tag:'→ 兩者皆可切入',tc:'tn',s:{b:2,p:2,g:1,ai:1,en:1,it:2}}
+]},
+{icon:'🤖',chip:'AI 時代態度',cs:'qc-ai',lay:'1',
+ title:'你如何看待 AI 對你職業嘅影響？',
+ sub:'AI 已可分析基因組數據及預測藥物活性，兩個學科都面臨轉型',
+ opts:[
+  {e:'😰',t:'擔心 AI 取代我，想揀最安全嘅路',d:'希望從事一個有「人情味」、暫時不易被機器取代的職業。臨床藥劑判斷仍需人類把關。',tag:'→ 藥劑學更抗 AI 短期衝擊',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
+  {e:'🚀',t:'我想成為「寫 AI」嘅人！',d:'不怕 AI，因為我就是開發 AI 工具嘅人。我要係 AI 醫療浪潮中做核心貢獻者。',tag:'→ 生物資訊學最核心',tc:'tb',s:{b:3,p:0,g:2,ai:3,en:2,it:3}},
+  {e:'🤝',t:'AI 是工具，我會善用它',d:'不特別擔心，相信無論哪個職業都需要擁抱 AI，關鍵係如何配合。',tag:'→ 兩者皆可',tc:'tn',s:{b:1,p:1,g:1,ai:1,en:1,it:1}}
+]},
+{icon:'🌏',chip:'發展視野',cs:'qc-intl',lay:'1',
+ title:'你的發展視野有幾大？',
+ sub:'河套香港園區已開園 ✦ 全球 Biotech Hub 正搶奪人才',
+ opts:[
+  {e:'🏡',t:'立足香港，穩定最重要',d:'鍾意在香港工作生活，唔太想出差或移居外地。本地牌照係最大保障。',tag:'→ 藥劑學本地最穩',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
+  {e:'🇨🇳',t:'大灣區闖一闖，深港雙城',d:'願意在深圳、廣州或河套工作，善用兩地制度優勢，河套係我嘅舞台。',tag:'→ 河套生命健康科技',tc:'tg',s:{b:2,p:1,g:3,ai:1,en:2,it:1}},
+  {e:'🌎',t:'波士頓、倫敦、新加坡 — 全球舞台！',d:'香港係起點！目標係在全球頂級 Biotech Hub 流動的國際人才。',tag:'→ 生物資訊學最國際化',tc:'ti',s:{b:3,p:0,g:2,ai:2,en:2,it:3}},
+  {e:'✈️',t:'先穩後闖 — 考完牌再出去',d:'先在香港拎穩牌照，有根基後再考慮海外進修或工作機會。',tag:'→ 藥劑學 + 海外碩士',tc:'tp',s:{b:1,p:2,g:1,ai:0,en:0,it:1}}
+]},
+{icon:'🚀',chip:'創業精神',cs:'qc-ai',lay:'1',
+ title:'你有冇夢想有一日自己創業？',
+ sub:'河套園區撥款 2 億培育生命健康科技初創，Biotech 創業潮來臨',
+ opts:[
+  {e:'💼',t:'穩定打工係首選',d:'寧願喺成熟機構（醫管局/大藥廠）有穩定薪酬，唔想承擔創業風險。',tag:'→ 藥劑學最穩定',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
+  {e:'💡',t:'我要創立自己嘅 Biotech！',d:'希望有一日創立生物科技公司，或加入早期 Startup 成為核心成員。',tag:'→ 生物資訊學最有機會',tc:'tb',s:{b:3,p:0,g:2,ai:2,en:3,it:2}},
+  {e:'🌱',t:'唔排除，視乎機緣',d:'目前冇明確計劃，但如果有好機會或拍檔，唔排除去試試。',tag:'→ 兩者皆可',tc:'tn',s:{b:1,p:2,g:1,ai:1,en:1,it:1}}
+]}
+];
+
+/* ════ STATE ════ */
+let cur=0,ans=[],sel=null;
+
+function startQuiz(){
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  cur=0;ans=[];sel=null;renderDots();renderQ();
+}
+
+function renderDots(){
+  const d=document.getElementById('sDots');d.innerHTML='';
+  QS.forEach((_,i)=>{
+    if(i>0){const l=document.createElement('div');l.className='sline'+(i<=cur?' done':'');d.appendChild(l)}
+    const s=document.createElement('div');
+    s.className='sdot'+(i<cur?' done':i===cur?' active':'');
+    s.textContent=i<cur?'✓':(i+1);d.appendChild(s);
+  });
+}
+
+function renderQ(){
+  sel=ans[cur]!==undefined?ans[cur]:null;
+  const q=QS[cur],pct=Math.round(((cur+1)/QS.length)*100);
+  document.getElementById('pFill').style.width=pct+'%';
+  document.getElementById('pLbl').textContent=`問題 ${cur+1} / ${QS.length}`;
+  document.getElementById('bkBtn').style.visibility=cur===0?'hidden':'visible';
+  renderDots();
+  const g=q.lay==='2';
+  const html=q.opts.map((o,i)=>{
+    let cls='';
+    if(sel===i)cls=o.s.b>o.s.p?'sb':o.s.p>o.s.b?'sp':o.s.it>1?'si':'sn';
+    return`<button class="ob ${cls}" onclick="pick(${i})">
+      <div class="ock">${sel===i?'✓':''}</div>
+      <span class="oem">${o.e}</span>
+      <div>
+        <div class="otit">${o.t}</div>
+        <div class="odesc">${o.d}</div>
+        <span class="otag ${o.tc}">${o.tag}</span>
+      </div>
+    </button>`;
+  }).join('');
+  document.getElementById('qBox').innerHTML=`
+    <div class="card">
+      <span class="qchip ${q.cs}">${q.chip}</span>
+      <span class="q-icon">${q.icon}</span>
+      <div class="q-title">${q.title}</div>
+      <div class="q-sub">${q.sub}</div>
+      <div class="${g?'opts opts-2':'opts'}">${html}</div>
+    </div>`;
+  upBtn();
+}
+
+function pick(i){
+  sel=i;ans[cur]=i;
+  document.querySelectorAll('.ob').forEach((b,idx)=>{
+    b.classList.remove('sb','sp','sn','si');
+    b.querySelector('.ock').textContent='';
+    if(idx===i){
+      const o=QS[cur].opts[i];
+      b.classList.add(o.s.b>o.s.p?'sb':o.s.p>o.s.b?'sp':o.s.it>1?'si':'sn');
+      b.querySelector('.ock').textContent='✓';
+    }
+  });upBtn();
+}
+
+function upBtn(){
+  const b=document.getElementById('nxBtn');
+  if(sel!==null){b.classList.add('on');b.textContent=cur===QS.length-1?'查看分析結果 🎉':'下一題 →';}
+  else b.classList.remove('on');
+}
+
+function nextQ(){if(sel===null)return;cur===QS.length-1?showResult():(cur++,sel=ans[cur]!==undefined?ans[cur]:null,renderQ());}
+function prevQ(){if(!cur)return;cur--;sel=ans[cur]!==undefined?ans[cur]:null;renderQ();}
+
+/* ════ CALC ════ */
+function calc(){
+  let B=0,P=0,G=0,AI=0,EN=0,IT=0,MX=0;
+  QS.forEach((q,i)=>{
+    if(ans[i]===undefined)return;
+    const s=q.opts[ans[i]].s;
+    B+=s.b;P+=s.p;G+=s.g;AI+=s.ai;EN+=s.en;IT+=s.it;MX+=3;
+  });
+  return{B,P,G,AI,EN,IT,MX,
+    bP:Math.round(B/MX*100),pP:Math.round(P/MX*100),
+    gP:Math.round(G/MX*100),aiP:Math.round(AI/MX*100),
+    enP:Math.round(EN/MX*100),itP:Math.round(IT/MX*100)};
+}
+
+/* ════ RADAR ════ */
+function drawRadar(cv,sc){
+  const ctx=cv.getContext('2d'),W=cv.width,H=cv.height,cx=W/2,cy=H/2,r=Math.min(W,H)*.37;
+  const labels=['學術配適','職業穩定','薪酬天花板','全球流動','AI 適應力','創業潛力'];
+  const N=6;ctx.clearRect(0,0,W,H);
+  const bA=[sc.bP,18,Math.min(sc.bP*.9,90),Math.max(sc.itP,sc.gP),sc.aiP,sc.enP];
+  const pA=[sc.pP,Math.min(sc.pP*.9,90),35,12,18,14];
+  function xy(a,v){return{x:cx+Math.cos(a)*r*(v/100),y:cy+Math.sin(a)*r*(v/100)};}
+  for(let ring=1;ring<=4;ring++){
+    ctx.beginPath();
+    for(let i=0;i<N;i++){const a=-Math.PI/2+(i/N)*Math.PI*2;const p=xy(a,ring*25);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);}
+    ctx.closePath();ctx.strokeStyle='#E0DDF0';ctx.lineWidth=1;ctx.stroke();
+  }
+  for(let i=0;i<N;i++){const a=-Math.PI/2+(i/N)*Math.PI*2;const p=xy(a,100);ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#E0DDF0';ctx.lineWidth=1;ctx.stroke();}
+  ctx.beginPath();bA.forEach((v,i)=>{const a=-Math.PI/2+(i/N)*Math.PI*2;const p=xy(a,v);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});
+  ctx.closePath();ctx.fillStyle='rgba(108,99,255,.18)';ctx.fill();ctx.strokeStyle='#6C63FF';ctx.lineWidth=2.5;ctx.stroke();
+  ctx.beginPath();pA.forEach((v,i)=>{const a=-Math.PI/2+(i/N)*Math.PI*2;const p=xy(a,v);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});
+  ctx.closePath();ctx.fillStyle='rgba(255,101,132,.15)';ctx.fill();ctx.strokeStyle='#FF6584';ctx.lineWidth=2.5;ctx.stroke();
+  ctx.font='bold 11px Noto Sans HK,sans-serif';ctx.fillStyle='#8886AC';ctx.textAlign='center';ctx.textBaseline='middle';
+  labels.forEach((l,i)=>{const a=-Math.PI/2+(i/N)*Math.PI*2;const p=xy(a,128);ctx.fillText(l,p.x,p.y);});
+  [...bA,...pA].forEach((v,i)=>{const bio=i<N;const a=-Math.PI/2+((i%N)/N)*Math.PI*2;const p=xy(a,v);ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle=bio?'#6C63FF':'#FF6584';ctx.fill();});
+}
+
+/* ════ SHOW RESULT ════ */
+function showResult(){
+  document.getElementById('quiz').classList.add('hidden');
+  const sc=calc(),diff=sc.B-sc.P;
+  let type,emoji,rl,rt,tTxt,dTxt;
+  if(diff>=7){type='bio';emoji='🧬';rl='rl-b';rt='rt-b';tTxt='生物資訊學（Bioinformatics）';dTxt='你係一個充滿探索精神、享受數據與科技交匯嘅人。生物資訊學將為你打開 AI 醫療、基因組學與河套創科生態系嘅大門。你嘅天花板唔係薪級表，而係一個不斷演化的全球科技世界。'}
+  else if(diff<=-7){type='pha';emoji='💊';rl='rl-p';rt='rt-p';tTxt='藥劑學（Pharmacy）';dTxt='你係一個重視穩定、享受專業執照帶來安全感、鍾意與人接觸嘅人。衞生署藥劑師起薪 HK$61,865/月，配合香港《基層醫療健康藍圖》2026 年社區藥房計劃，你入行嘅時機非常好！'}
+  else if(diff>0){type='bio';emoji='🧬✨';rl='rl-b';rt='rt-b';tTxt='傾向生物資訊學';dTxt='你嘅特質傾向生物資訊學方向，但亦有穩健嘅一面。如果你對編程有熱誠且願意讀博士，生物資訊學係更好嘅選擇；否則藥劑學亦係合理嘅後備方案。'}
+  else if(diff<0){type='pha';emoji='💊✨';rl='rl-p';rt='rt-p';tTxt='傾向藥劑學';dTxt='你嘅特質更適合藥劑學嘅專業路線。社區藥劑師角色正擴大，執業牌照係你最強嘅護城河。畢業後亦可透過進修切入藥廠研發領域。'}
+  else{type='tie';emoji='⚖️';rl='rl-t';rt='rt-t';tTxt='你兩者都適合！';dTxt='你嘅特質非常平均，顯示你係全面型人才。建議考慮「進修意願」——願意讀博士選生物資訊學；想即時工作並有穩定高薪選藥劑學。亦可選藥劑學本科，再讀生物資訊碩士，走複合路線。'}
+
+  const dims=[
+    {i:'🌟',l:'性格',v:()=>{const o=QS[0].opts[ans[0]];return o.s.b>o.s.p?'探索型 → 🧬':'穩健型 → 💊';}},
+    {i:'💼',l:'工作偏好',v:()=>{const o=QS[1].opts[ans[1]];return o.s.b>o.s.p?'數據導向 → 🧬':o.s.p>o.s.b?'臨床導向 → 💊':'均衡 ⚖️';}},
+    {i:'📚',l:'學科強項',v:()=>{const o=QS[2].opts[ans[2]];return o.s.b>o.s.p?'數理電腦 → 🧬':o.s.p>o.s.b?'生物化學 → 💊':'平均 ⚖️';}},
+    {i:'🎓',l:'進修意願',v:()=>{const o=QS[3].opts[ans[3]];return o.s.b>o.s.p?'願讀博 → 🧬':o.s.p>o.s.b?'即刻工作 → 💊':'視乎情況 ⚖️';}},
+    {i:'💰',l:'薪酬期望',v:()=>{const o=QS[4].opts[ans[4]];return o.s.b>o.s.p?'高天花板 → 🧬':o.s.p>o.s.b?'高起點 → 💊':'平衡 ⚖️';}},
+    {i:'⏰',l:'時間成本',v:()=>{const o=QS[5].opts[ans[5]];return o.s.b>o.s.p?'先苦後甜 → 🧬':o.s.p>o.s.b?'即時回報 → 💊':'視乎 ⚖️';}},
+    {i:'🔭',l:'未來方向',v:()=>{const o=QS[6].opts[ans[6]];return o.s.b>o.s.p?'AI科研 → 🧬':o.s.p>o.s.b?'臨床執業 → 💊':'藥廠研發 ⚖️';}},
+    {i:'🤖',l:'AI態度',v:()=>{const o=QS[7].opts[ans[7]];return o.s.ai>=2?'擁抱AI → 🧬':o.s.ai===0?'避開AI → 💊':'善用AI ⚖️';}},
+    {i:'🌏',l:'發展視野',v:()=>{const o=QS[8].opts[ans[8]];return o.s.it>=2?'國際/大灣區 → 🧬':o.s.it===0?'立足香港 → 💊':'開放 ⚖️';}},
+    {i:'🚀',l:'創業精神',v:()=>{const o=QS[9].opts[ans[9]];return o.s.en>=2?'創業型 → 🧬':o.s.en===0?'穩定型 → 💊':'機緣型 ⚖️';}},
+  ];
+
+  const isBio=type==='bio'||(type==='tie'&&sc.B>=sc.P);
+
+  /* ── 薪酬對照表 ── */
+  const salTableBio=`
+    <table class="sal-table">
+      <tr><th>職涯階段</th><th>年資</th><th>月薪（HKD）</th><th>資料來源</th></tr>
+      <tr><td>初級生物資訊分析師（RA）</td><td>0-2 年</td><td>$20,000-$25,000</td><td><span class="sal-badge sb-p">大學研究職</span></td></tr>
+      <tr><td>生物資訊工程師（工業界）</td><td>1-3 年</td><td>$35,000-$42,000</td><td><span class="sal-badge sb-b">ERI 薪酬調查</span></td></tr>
+      <tr><td>生物資訊科學家（5-10年）</td><td>5-10 年</td><td>$63,000-$80,000</td><td><span class="sal-badge sb-g">ERI 薪酬調查</span></td></tr>
+      <tr><td>資深科學家（10年+）</td><td>10 年+</td><td>$80,000-$110,000</td><td><span class="sal-badge sb-g">核實數據</span></td></tr>
+      <tr><td>頂尖 AI 藥研專家 / 創業</td><td>15 年+</td><td>$100,000+</td><td><span class="sal-badge sb-g">行業最高位</span></td></tr>
+    </table>
+    <div class="data-note">⚠️ 注意：RA（研究助理）起薪較低，以大學學術路線為主。如走工業界（藥廠/Biotech），初級工程師薪酬更高。PhD 畢業後起薪通常比本科生高 40-60%。</div>`;
+
+  const salTablePha=`
+    <table class="sal-table">
+      <tr><th>機構 / 職級</th><th>月薪（HKD）</th><th>資料來源</th></tr>
+      <tr><td>衞生署藥劑師（起薪 MPS P27）</td><td>$61,865</td><td><span class="sal-badge sb-g">政府官方數據</span></td></tr>
+      <tr><td>醫管局藥劑師（起薪）</td><td>$56,450</td><td><span class="sal-badge sb-g">醫管局薪級表</span></td></tr>
+      <tr><td>私營藥房 / 社區藥劑師</td><td>$45,000-$65,000</td><td><span class="sal-badge sb-b">市場薪酬數據</span></td></tr>
+      <tr><td>高級藥劑師（MPS P45-49）</td><td>$117,580-$135,470</td><td><span class="sal-badge sb-g">政府官方數據</span></td></tr>
+      <tr><td>總藥劑師 / 管理層</td><td>$150,950-$179,425</td><td><span class="sal-badge sb-g">政府官方數據</span></td></tr>
+    </table>
+    <div class="data-note">⚠️ 注意：私營藥房薪酬差異較大。近年香港藥劑師供應量上升，部分私營藥房存在薪酬壓力。公營（衞生署/醫管局）起薪最穩定，福利包括退休金及醫療保障。</div>`;
+
+  let pros,cons,road;
+  if(isBio){
+    pros=['🌍 全球流動性極強，科技公司爭搶','📈 資深科學家年薪可達 HK$107萬+','🤖 AI 時代最核心人才，不怕被淘汰','🏗️ 河套園區 60+ 企業等待你','🎓 讀博有津貼，4 年可淨儲 $30-50 萬','🚀 Biotech 創業機會全球爆發'];
+    cons=['⏰ 本科初期起薪（RA）約 $20k-25k，低於藥劑師','📖 需讀博士才能發揮最大薪酬潛力','🖥️ 需持續學習新編程技術，自我更新','⚠️ 冇臨床執業牌照，選擇面較窄'];
+    road=[
+      {dc:'rd-b',em:'📚',y:'第 1-4 年',d:'港大 BBiomedSc（主修生物資訊學）',s:'年費約 $4.2 萬 | 可申請獎學金'},
+      {dc:'rd-b',em:'🔬',y:'第 5-8 年',d:'MPhil / PhD（有津貼 $18,500-$28,400/月）',s:'4 年可淨儲約 HK$30-50 萬'},
+      {dc:'rd-s',em:'🌍',y:'第 9-10 年',d:'入職藥廠研發 / 河套 Biotech / 海外科研中心',s:'月薪約 $50,000-$80,000（工業界）'},
+      {dc:'rd-g',em:'🚀',y:'第 15 年+',d:'資深科學家 / AI 藥研主管 / Biotech 創辦人',s:'年薪 HK$100 萬-$130 萬+'},
+    ];
+  }else{
+    pros=['💰 衞生署起薪 $61,865，醫管局 $56,450','🛡️ 專業牌照保護，職業穩定有保障','🏥 社區藥房計劃 2026 年推出，需求增加','👥 受社會高度尊重的專業地位','🔄 可轉型做藥廠研發（RA/CRA）','⚖️ 工作生活平衡，時間規律'];
+    cons=['📊 薪酬天花板受限於政府薪級表','🌏 需本地牌照，跨國流動性有限','🤖 AI 自動化對部分重複性派藥工作有影響','⚡ 長遠需持續進修維持競爭力'];
+    road=[
+      {dc:'rd-p',em:'📚',y:'第 1-4 年',d:'港大 BPharm（藥劑學學士）',s:'年費約 $4.2 萬 | 可申請獎學金'},
+      {dc:'rd-p',em:'💊',y:'第 5 年',d:'完成實習，正式成為香港註冊藥劑師',s:'衞生署月薪 $61,865 | 醫管局 $56,450'},
+      {dc:'rd-p',em:'🏥',y:'第 6-10 年',d:'醫管局 / 社區藥房擴張 / 私院，配合藍圖',s:'月薪 $70,000-$100,000'},
+      {dc:'rd-g',em:'🌟',y:'第 10 年+',d:'高級藥劑師 / 總藥劑師 / 藥廠管理層',s:'月薪 $117,580-$179,425'},
+    ];
+  }
+
+  const worldBio=[
+    {flag:'🇺🇸',city:'波士頓',role:'AI 藥物研發',sal:'USD $120k-200k'},
+    {flag:'🇬🇧',city:'倫敦/劍橋',role:'基因組分析師',sal:'GBP £55k-90k'},
+    {flag:'🇸🇬',city:'新加坡',role:'Biotech 科學家',sal:'SGD $80k-150k'},
+    {flag:'🇨🇭',city:'巴塞爾',role:'Roche/Novartis',sal:'CHF 120k-180k'},
+    {flag:'🇨🇳',city:'深圳河套',role:'AI 醫療研發',sal:'RMB 50-120 萬/年'},
+    {flag:'🇦🇺',city:'墨爾本',role:'精準醫療分析',sal:'AUD $90k-130k'},
+  ];
+  const worldPha=[
+    {flag:'🇭🇰',city:'香港',role:'衞生署/醫管局',sal:'HK$61,865 起/月'},
+    {flag:'🇬🇧',city:'倫敦',role:'NHS 臨床藥劑師',sal:'GBP £35k-50k'},
+    {flag:'🇦🇺',city:'澳洲',role:'社區/醫院藥劑師',sal:'AUD $75k-110k'},
+    {flag:'🇸🇬',city:'新加坡',role:'公立醫院藥劑師',sal:'SGD $48k-75k'},
+    {flag:'🇺🇸',city:'美國',role:'臨床藥劑師 NAPLEX',sal:'USD $120k-160k'},
+    {flag:'🇨🇳',city:'大灣區',role:'藥廠 RA / CRA',sal:'RMB 20-60 萬/年'},
+  ];
+  const worldData=isBio?worldBio:worldPha;
+
+  const rEl=document.getElementById('result');rEl.classList.remove('hidden');
+  rEl.innerHTML=`
+    <div class="rhero">
+      <span class="rem">${emoji}</span>
+      <div class="rlbl ${rl}">🎯 你的分析結果</div>
+      <div class="rtit ${rt}">${tTxt}</div>
+      <div class="rdesc">${dTxt}</div>
+    </div>
+
+    <div class="slbl">📊 綜合適配評分</div>
+    <div class="srow"><div class="slb">🧬 生物資訊</div><div class="strk"><div class="sfil sf-b" id="bBar" style="width:0%"></div></div><div class="snum" style="color:var(--bio)">${sc.bP}%</div></div>
+    <div class="srow"><div class="slb">💊 藥劑學</div><div class="strk"><div class="sfil sf-p" id="pBar" style="width:0%"></div></div><div class="snum" style="color:var(--pha)">${sc.pP}%</div></div>
+
+    <div class="divider"></div>
+
+    <div class="radar-sec">
+      <div class="slbl">🕸️ 六維能力雷達圖</div>
+      <canvas id="rCanvas" width="380" height="320" style="max-width:100%"></canvas>
+      <div class="radar-legend">
+        <div class="leg"><div class="ldot" style="background:var(--bio)"></div>生物資訊學</div>
+        <div class="leg"><div class="ldot" style="background:var(--pha)"></div>藥劑學</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="slbl">🆕 2026 年四大新指標</div>
+    <div class="spgrid">
+      <div class="spcard">
+        <div class="sp-i">🌏</div><div class="sp-l">大灣區指數</div>
+        <div class="sp-ring"><svg viewBox="0 0 60 60" width="60" height="60"><circle class="sr-bg" cx="30" cy="30" r="25"/><circle class="sr-f" cx="30" cy="30" r="25" stroke="var(--grn)" stroke-dasharray="${sc.gP*1.57} 157"/></svg><div class="sr-txt" style="color:var(--grn)">${sc.gP}%</div></div>
+        <div class="sp-note">${sc.gP>=50?'河套黃金人才 🌟':'立足香港穩步走 🏠'}</div>
+      </div>
+      <div class="spcard">
+        <div class="sp-i">🤖</div><div class="sp-l">AI 適應力</div>
+        <div class="sp-ring"><svg viewBox="0 0 60 60" width="60" height="60"><circle class="sr-bg" cx="30" cy="30" r="25"/><circle class="sr-f" cx="30" cy="30" r="25" stroke="var(--bio)" stroke-dasharray="${sc.aiP*1.57} 157"/></svg><div class="sr-txt" style="color:var(--bio)">${sc.aiP}%</div></div>
+        <div class="sp-note">${sc.aiP>=50?'AI 浪潮推動者 🚀':'AI 衝擊抵抗型 🛡️'}</div>
+      </div>
+      <div class="spcard">
+        <div class="sp-i">🚀</div><div class="sp-l">創業潛力</div>
+        <div class="sp-ring"><svg viewBox="0 0 60 60" width="60" height="60"><circle class="sr-bg" cx="30" cy="30" r="25"/><circle class="sr-f" cx="30" cy="30" r="25" stroke="var(--amb)" stroke-dasharray="${sc.enP*1.57} 157"/></svg><div class="sr-txt" style="color:var(--amb)">${sc.enP}%</div></div>
+        <div class="sp-note">${sc.enP>=50?'Biotech 創辦人質 🦄':'穩健打工族 💼'}</div>
+      </div>
+      <div class="spcard">
+        <div class="sp-i">✈️</div><div class="sp-l">國際流動力</div>
+        <div class="sp-ring"><svg viewBox="0 0 60 60" width="60" height="60"><circle class="sr-bg" cx="30" cy="30" r="25"/><circle class="sr-f" cx="30" cy="30" r="25" stroke="var(--sky)" stroke-dasharray="${sc.itP*1.57} 157"/></svg><div class="sr-txt" style="color:var(--sky)">${sc.itP}%</div></div>
+        <div class="sp-note">${sc.itP>=50?'全球流動型人才 🌍':'本地紮根型人才 🏡'}</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="slbl">🔍 10 維度逐項分析</div>
+    <div class="dgrid">${dims.map(d=>`<div class="ditem"><div class="di-i">${d.i}</div><div class="di-l">${d.l}</div><div class="di-v">${d.v()}</div></div>`).join('')}</div>
+
+    <div class="divider"></div>
+
+    <div class="slbl">💵 核實薪酬數據（2025 年）</div>
+    ${isBio?salTableBio:salTablePha}
+
+    <div class="divider"></div>
+
+    <div class="slbl">✅ 優勢 vs ⚠️ 挑戰</div>
+    <div class="pcgrid">
+      <div class="pbox"><h4>✅ 這條路的優勢</h4>${pros.map(p=>`<li><span>${p}</span></li>`).join('')}</div>
+      <div class="cbox"><h4>⚠️ 需要考慮的挑戰</h4>${cons.map(c=>`<li><span>${c}</span></li>`).join('')}</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="banner-card bc-gba">
+      <div class="bc-head"><span style="font-size:24px">🏗️</span><h3>河套香港園區機遇（2026 最新）</h3></div>
+      <div class="bc-body">
+        <span class="pulse"></span>河套香港園區已正式開園，生命健康科技與 AI 為核心產業。60+ 企業進駐，政府投入 100 億加速發展，並設立 2 億元生命健康初創培育計劃。
+        ${isBio?'<strong>生物資訊學畢業生</strong>係河套最搶手人才，大數據分析及 AI 藥研職位持續增加。':'<strong>藥劑學畢業生</strong>可透過臨床試驗管理（CRA）或法規事務（RA）角色，切入河套醫藥生態系。'}
+      </div>
+      <div class="bc-tags">
+        <span class="bctag bctag-g">🧬 生命健康科技區</span>
+        <span class="bctag bctag-g">🤖 AI 數據科學</span>
+        <span class="bctag bctag-g">💊 臨床試驗中心</span>
+        <span class="bctag bctag-g">🚀 初創孵化器</span>
+      </div>
+    </div>
+
+    <div class="banner-card bc-intl">
+      <div class="bc-head"><span style="font-size:24px">🌍</span><h3>全球就業機遇地圖</h3></div>
+      <div class="bc-body">${isBio?'生物資訊學具備極強嘅全球流動性。以下係主要 Biotech Hub 嘅職位與薪酬參考（數據來源：ERI/行業調查）：':'藥劑師嘅國際流動需考取當地牌照。以下係主要國家嘅職位與薪酬參考：'}</div>
+      <div class="world-row">${worldData.map(w=>`<div class="world-item"><div class="wi-flag">${w.flag}</div><div class="wi-city">${w.city}</div><div class="wi-role">${w.role}</div><div class="wi-sal">${w.sal}</div></div>`).join('')}</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="slbl">🗺️ 你的職業路線圖</div>
+    <div class="road-steps">${road.map(r=>`<div class="rstep"><div class="rdot ${r.dc}">${r.em}</div><div class="rcont"><div class="ry">${r.y}</div><div class="rd">${r.d}</div><div class="rs">${r.s}</div></div></div>`).join('')}</div>
+
+    <div class="divider"></div>
+
+    <div class="slbl">📤 分享結果</div>
+    <div class="share-row">
+      <button class="share-btn" onclick="copyR()">📋 複製結果文字</button>
+      <button class="share-btn" onclick="dlR()">📸 儲存截圖提示</button>
+    </div>
+
+    <div class="rnote">
+      <strong>💡 溫馨提示：</strong>薪酬數據已根據政府官方薪級表及 ERI 薪酬調查核實（2025年），僅供參考，實際薪酬視乎機構、個人表現及市場狀況而定。
+      強烈建議出席 <strong>港大 Open Day</strong> 與在讀同學交流，並諮詢升學顧問，再做最終決定。
+      無論選擇哪條路，成功的關鍵永遠是<strong>你對這條路的熱情與堅持</strong>。加油！🎉
+    </div>
+
+    <button class="btn-r" onclick="restart()">🔄 重新分析</button>
+  `;
+
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>{
+    document.getElementById('bBar').style.width=sc.bP+'%';
+    document.getElementById('pBar').style.width=sc.pP+'%';
+    drawRadar(document.getElementById('rCanvas'),sc);
+  },400);
+}
+
+function restart(){
+  cur=0;ans=[];sel=null;
+  const r=document.getElementById('result');r.classList.add('hidden');r.innerHTML='';
+  document.getElementById('intro').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function copyR(){
+  const sc=calc();
+  navigator.clipboard.writeText(
+    `我的選科分析結果（2026版）\n🧬 生物資訊學：${sc.bP}%\n💊 藥劑學：${sc.pP}%\n🌏 大灣區指數：${sc.gP}%\n🤖 AI適應力：${sc.aiP}%\n🚀 創業潛力：${sc.enP}%\n✈️ 國際流動力：${sc.itP}%`
+  ).then(()=>alert('✅ 已複製！可以貼畀家長或同學'));
+}
+
+function dlR(){
+  alert('💡 按「Ctrl+P」（Windows）或「Cmd+P」（Mac）即可儲存或列印此頁面！');
+}
+</script>
+</body>
+</html>

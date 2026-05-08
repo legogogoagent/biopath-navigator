@@ -79,7 +79,7 @@ export default async function handler(req, res) {
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 25000);
+    const timeout = setTimeout(() => controller.abort(), 45000);
 
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
@@ -108,7 +108,10 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content.trim();
+    let content = (data.choices[0].message.content || '').trim();
+    if (!content && data.choices[0].message.reasoning_content) {
+      content = data.choices[0].message.reasoning_content.trim();
+    }
 
     let parsed;
     try {

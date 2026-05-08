@@ -79,7 +79,21 @@ export default async function handler(req, res) {
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 45000);
+    const timeout = setTimeout(() => controller.abort(), isAnalyze ? 60000 : 20000);
+
+    const isAnalyze = mode === 'analyze';
+    const model = isAnalyze ? 'deepseek-v4-pro' : 'deepseek-v4-flash';
+
+    const body = {
+      model,
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...messages,
+        { role: 'user', content: userContent },
+      ],
+      temperature: 0.7,
+      max_tokens: isAnalyze ? 8192 : 1024,
+    };
 
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
@@ -87,16 +101,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
       },
-      body: JSON.stringify({
-        model: 'deepseek-v4-pro',
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          ...messages,
-          { role: 'user', content: userContent },
-        ],
-        temperature: 0.7,
-        max_tokens: mode === 'analyze' ? 4096 : 2048,
-      }),
+      body: JSON.stringify(body),
       signal: controller.signal,
     });
 

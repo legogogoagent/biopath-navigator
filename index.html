@@ -331,97 +331,61 @@ body{font-family:'Noto Sans HK',sans-serif;background:var(--bg);color:var(--text
 </div>
 
 <script>
-/* ════ QUESTIONS ════ */
-const QS=[
-{icon:'🌟',chip:'性格維度',cs:'qc-n',lay:'2',
- title:'你最能形容自己的性格是哪一種？',
- sub:'揀最貼近你平時做事風格嘅選項',
- opts:[
-  {e:'🛡️',t:'穩健守護型',d:'鍾意有清晰路線，工作有保障，討厭不確定性。安全感大於刺激感。',tag:'藥劑師特質',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
-  {e:'🚀',t:'開拓探索型',d:'享受面對未知、接受失敗再試。「揾到答案」令我最有成就感。',tag:'科研人才特質',tc:'tb',s:{b:3,p:0,g:1,ai:1,en:2,it:2}}
-]},
-{icon:'💼',chip:'工作偏好',cs:'qc-n',lay:'1',
- title:'你更喜歡哪一種工作場景？',
- sub:'想像自己每天返工係做緊乜',
- opts:[
-  {e:'🏥',t:'面對病人，直接服務',d:'幫助到病人、見到佢地好返有成就感。鍾意臨床環境同人際互動。',tag:'→ 藥劑學',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
-  {e:'💻',t:'面對電腦，破解數據',d:'對住屏幕分析複雜問題。鍾意寫程式、邏輯推理同大數據。',tag:'→ 生物資訊學',tc:'tb',s:{b:3,p:0,g:1,ai:2,en:1,it:2}},
-  {e:'🔬',t:'兩者皆可，鍾意實驗室',d:'喜歡動手做實驗，同時分析數據，唔介意兩種環境。',tag:'→ 兩者均可',tc:'tn',s:{b:1,p:1,g:1,ai:1,en:1,it:1}}
-]},
-{icon:'📚',chip:'學科強項',cs:'qc-n',lay:'1',
- title:'以下哪類科目係你的強項？',
- sub:'誠實回答，揀你係學校真係叻嘅那類',
- opts:[
-  {e:'🧪',t:'生物 / 化學型',d:'生物化學成績特別好，鍾意記憶分子結構、反應原理同生命科學。',tag:'→ 藥劑學優勢',tc:'tp',s:{b:1,p:3,g:0,ai:0,en:0,it:0}},
-  {e:'🖥️',t:'數學 / 電腦型',d:'Maths 係強項，喜歡邏輯、算法，有自學過 Python / R。',tag:'→ 生物資訊學優勢',tc:'tb',s:{b:3,p:1,g:1,ai:2,en:1,it:2}},
-  {e:'⚖️',t:'兩者平均',d:'生化同數理都 OK，冇特別偏科，兩邊都有興趣。',tag:'→ 兩者均可',tc:'tn',s:{b:2,p:2,g:1,ai:1,en:1,it:1}}
-]},
-{icon:'🎓',chip:'進修意願',cs:'qc-n',lay:'1',
- title:'本科畢業後，你願意繼續進修幾耐？',
- sub:'呢個係決定長線錢途嘅最關鍵問題',
- opts:[
-  {e:'🏃',t:'唔想讀，立即工作',d:'本科 4 年已足夠，想盡快入職場，家庭需要我盡快賺錢。',tag:'→ 藥劑學最合適',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:1,it:0}},
-  {e:'📖',t:'願讀 1-2 年碩士',d:'讀個 Master 可以接受，想快啲將技術轉化為收入。',tag:'→ 兩者皆可',tc:'tn',s:{b:2,p:2,g:1,ai:1,en:1,it:1}},
-  {e:'🔭',t:'願讀 4-6 年博士',d:'長線投資，讀 PhD 唔係問題。明白讀博有津貼，願意成為頂尖專家。',tag:'→ 生物資訊學爆發',tc:'tb',s:{b:3,p:0,g:2,ai:2,en:2,it:2}}
-]},
-{icon:'💰',chip:'薪酬期望',cs:'qc-n',lay:'1',
- title:'你對薪酬的最大期望是？',
- sub:'誠實揀，冇對錯之分',
- opts:[
-  {e:'💎',t:'起點要高，穩中求勝',d:'25 歲起薪要達 HK$55,000+，唔需要最高但要夠穩定，年年加薪。',tag:'→ 衞生署藥劑師 $61,865 起',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
-  {e:'📈',t:'接受先低後高，衝極高天花板',d:'初期可以低啲（~$35k），但要有機會衝上年薪百萬甚至更高。願意博一搏。',tag:'→ 生物資訊資深科學家年薪 $100萬+',tc:'tb',s:{b:3,p:0,g:2,ai:2,en:2,it:2}},
-  {e:'🎯',t:'穩中有增長，兩者平衡',d:'起點中上，同時要有升職空間，唔想被薪級表封死。',tag:'→ 兩者均可',tc:'tn',s:{b:2,p:2,g:1,ai:1,en:1,it:1}}
-]},
-{icon:'⏰',chip:'時間成本',cs:'qc-n',lay:'1',
- title:'你係「先苦後甜」定「即時回報」型？',
- sub:'考慮家庭的實際財務狀況',
- opts:[
-  {e:'⚡',t:'即時回報 — 盡快賺錢',d:'家庭環境唔允許多讀書，或者我需要盡快財務獨立。',tag:'→ 藥劑學 第5年月薪$55k+',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
-  {e:'🌱',t:'先苦後甜 — 投資未來',d:'家裡支持多讀幾年，明白讀 PhD 有津貼（$18,500-$28,400/月），係長線投資。',tag:'→ 生物資訊學高天花板',tc:'tb',s:{b:3,p:0,g:2,ai:2,en:2,it:2}},
-  {e:'🤔',t:'視乎情況 — 有 Funding 先讀',d:'拿到獎學金才繼續讀，否則傾向快點工作。',tag:'→ 視乎機遇',tc:'tn',s:{b:2,p:2,g:1,ai:1,en:1,it:1}}
-]},
-{icon:'🔭',chip:'未來方向',cs:'qc-n',lay:'1',
- title:'你最嚮往的未來是？',
- sub:'唔需要考慮現實，揀最令你興奮的',
- opts:[
-  {e:'🩺',t:'成為受人尊重嘅臨床專業人士',d:'持有專業牌照，在香港醫療體系有法定地位，服務社會，安穩有尊嚴。',tag:'→ 藥劑師路徑',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
-  {e:'🧬',t:'用 AI 改變未來醫療，揚名國際',d:'在基因工程、AI 藥物研發領域，係國際舞台發表研究，讓世界聽到我嘅名字。',tag:'→ 生物資訊學路徑',tc:'tb',s:{b:3,p:0,g:2,ai:2,en:2,it:3}},
-  {e:'🏭',t:'在大藥廠推動新藥面世',d:'跨國藥廠推動新藥，參與臨床研究或法規審批（RA），結合臨床同商業。',tag:'→ 兩者皆可切入',tc:'tn',s:{b:2,p:2,g:1,ai:1,en:1,it:2}}
-]},
-{icon:'🤖',chip:'AI 時代態度',cs:'qc-ai',lay:'1',
- title:'你如何看待 AI 對你職業嘅影響？',
- sub:'AI 已可分析基因組數據及預測藥物活性，兩個學科都面臨轉型',
- opts:[
-  {e:'😰',t:'擔心 AI 取代我，想揀最安全嘅路',d:'希望從事一個有「人情味」、暫時不易被機器取代的職業。臨床藥劑判斷仍需人類把關。',tag:'→ 藥劑學更抗 AI 短期衝擊',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
-  {e:'🚀',t:'我想成為「寫 AI」嘅人！',d:'不怕 AI，因為我就是開發 AI 工具嘅人。我要係 AI 醫療浪潮中做核心貢獻者。',tag:'→ 生物資訊學最核心',tc:'tb',s:{b:3,p:0,g:2,ai:3,en:2,it:3}},
-  {e:'🤝',t:'AI 是工具，我會善用它',d:'不特別擔心，相信無論哪個職業都需要擁抱 AI，關鍵係如何配合。',tag:'→ 兩者皆可',tc:'tn',s:{b:1,p:1,g:1,ai:1,en:1,it:1}}
-]},
-{icon:'🌏',chip:'發展視野',cs:'qc-intl',lay:'1',
- title:'你的發展視野有幾大？',
- sub:'河套香港園區已開園 ✦ 全球 Biotech Hub 正搶奪人才',
- opts:[
-  {e:'🏡',t:'立足香港，穩定最重要',d:'鍾意在香港工作生活，唔太想出差或移居外地。本地牌照係最大保障。',tag:'→ 藥劑學本地最穩',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
-  {e:'🇨🇳',t:'大灣區闖一闖，深港雙城',d:'願意在深圳、廣州或河套工作，善用兩地制度優勢，河套係我嘅舞台。',tag:'→ 河套生命健康科技',tc:'tg',s:{b:2,p:1,g:3,ai:1,en:2,it:1}},
-  {e:'🌎',t:'波士頓、倫敦、新加坡 — 全球舞台！',d:'香港係起點！目標係在全球頂級 Biotech Hub 流動的國際人才。',tag:'→ 生物資訊學最國際化',tc:'ti',s:{b:3,p:0,g:2,ai:2,en:2,it:3}},
-  {e:'✈️',t:'先穩後闖 — 考完牌再出去',d:'先在香港拎穩牌照，有根基後再考慮海外進修或工作機會。',tag:'→ 藥劑學 + 海外碩士',tc:'tp',s:{b:1,p:2,g:1,ai:0,en:0,it:1}}
-]},
-{icon:'🚀',chip:'創業精神',cs:'qc-ai',lay:'1',
- title:'你有冇夢想有一日自己創業？',
- sub:'河套園區撥款 2 億培育生命健康科技初創，Biotech 創業潮來臨',
- opts:[
-  {e:'💼',t:'穩定打工係首選',d:'寧願喺成熟機構（醫管局/大藥廠）有穩定薪酬，唔想承擔創業風險。',tag:'→ 藥劑學最穩定',tc:'tp',s:{b:0,p:3,g:0,ai:0,en:0,it:0}},
-  {e:'💡',t:'我要創立自己嘅 Biotech！',d:'希望有一日創立生物科技公司，或加入早期 Startup 成為核心成員。',tag:'→ 生物資訊學最有機會',tc:'tb',s:{b:3,p:0,g:2,ai:2,en:3,it:2}},
-  {e:'🌱',t:'唔排除，視乎機緣',d:'目前冇明確計劃，但如果有好機會或拍檔，唔排除去試試。',tag:'→ 兩者皆可',tc:'tn',s:{b:1,p:2,g:1,ai:1,en:1,it:1}}
-]}
-];
-
 /* ════ STATE ════ */
-let cur=0,ans=[],sel=null;
+const MAX_Q = 20;
+let state = { phase: 'intro', messages: [], curQ: null, answers: [], curIdx: 0, selIdx: null, analyzing: false };
 
-function startQuiz(){
+/* ════ API ════ */
+async function callAPI(mode) {
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: state.messages, mode }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `API error ${res.status}`);
+  }
+  return res.json();
+}
+
+async function fetchNextQuestion() {
+  try {
+    const data = await callAPI('chat');
+    if (data.type === 'question') {
+      state.curQ = data;
+      state.selIdx = null;
+      renderQ();
+    }
+  } catch (e) {
+    alert('AI 回應失敗: ' + e.message + '\n請檢查網絡後重試。');
+  }
+}
+
+async function fetchAnalysis() {
+  try {
+    state.analyzing = true;
+    const data = await callAPI('analyze');
+    if (data.type === 'analysis') {
+      state.analysisData = data;
+      showResult(data);
+    }
+  } catch (e) {
+    state.analyzing = false;
+    alert('AI 分析失敗: ' + e.message + '\n請重試。');
+  }
+}
+
+function startQuiz() {
   document.getElementById('intro').classList.add('hidden');
   document.getElementById('quiz').classList.remove('hidden');
-  cur=0;ans=[];sel=null;renderDots();renderQ();
+  state.phase = 'quiz';
+  state.messages = [];
+  state.answers = [];
+  state.curIdx = 0;
+  state.selIdx = null;
+  state.analyzing = false;
+  fetchNextQuestion();
 }
 
 function renderDots(){

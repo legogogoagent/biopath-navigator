@@ -388,69 +388,121 @@ function startQuiz() {
   fetchNextQuestion();
 }
 
-function renderDots(){
-  const d=document.getElementById('sDots');d.innerHTML='';
-  QS.forEach((_,i)=>{
-    if(i>0){const l=document.createElement('div');l.className='sline'+(i<=cur?' done':'');d.appendChild(l)}
-    const s=document.createElement('div');
-    s.className='sdot'+(i<cur?' done':i===cur?' active':'');
-    s.textContent=i<cur?'✓':(i+1);d.appendChild(s);
-  });
-}
+function renderQ() {
+  const q = state.curQ;
+  if (!q) {
+    document.getElementById('qBox').innerHTML = '<div class="card"><div class="q-title" style="text-align:center">AI 正在思考...</div><div class="q-sub">請稍候片刻</div></div>';
+    return;
+  }
+  const pct = Math.round(((state.curIdx + 1) / MAX_Q) * 100);
+  document.getElementById('pFill').style.width = pct + '%';
+  document.getElementById('pLbl').textContent = `問題 ${state.curIdx + 1} / 最多 ${MAX_Q}`;
+  document.getElementById('bkBtn').style.visibility = state.curIdx === 0 ? 'hidden' : 'visible';
 
-function renderQ(){
-  sel=ans[cur]!==undefined?ans[cur]:null;
-  const q=QS[cur],pct=Math.round(((cur+1)/QS.length)*100);
-  document.getElementById('pFill').style.width=pct+'%';
-  document.getElementById('pLbl').textContent=`問題 ${cur+1} / ${QS.length}`;
-  document.getElementById('bkBtn').style.visibility=cur===0?'hidden':'visible';
-  renderDots();
-  const g=q.lay==='2';
-  const html=q.opts.map((o,i)=>{
-    let cls='';
-    if(sel===i)cls=o.s.b>o.s.p?'sb':o.s.p>o.s.b?'sp':o.s.it>1?'si':'sn';
-    return`<button class="ob ${cls}" onclick="pick(${i})">
-      <div class="ock">${sel===i?'✓':''}</div>
-      <span class="oem">${o.e}</span>
-      <div>
-        <div class="otit">${o.t}</div>
-        <div class="odesc">${o.d}</div>
-        <span class="otag ${o.tc}">${o.tag}</span>
-      </div>
-    </button>`;
-  }).join('');
-  document.getElementById('qBox').innerHTML=`
-    <div class="card">
-      <span class="qchip ${q.cs}">${q.chip}</span>
-      <span class="q-icon">${q.icon}</span>
-      <div class="q-title">${q.title}</div>
-      <div class="q-sub">${q.sub}</div>
-      <div class="${g?'opts opts-2':'opts'}">${html}</div>
-    </div>`;
+  const csClass = pickChipClass(q.chip);
+  let html = `<div class="card">
+    <span class="qchip ${csClass}">${q.chip || ''}</span>
+    <div class="q-title">${q.question}</div>
+    <div class="q-sub">${q.subtitle || ''}</div>
+    <div class="opts">`;
+
+  if (q.options && q.options.length) {
+    q.options.forEach((o, i) => {
+      let cls = '';
+      if (state.selIdx === i) {
+        cls = o.tag && o.tag.includes('藥劑') ? 'sp' : o.tag && o.tag.includes('生物') ? 'sb' : 'sn';
+      }
+      html += `<button class="ob ${cls}" onclick="pickOption(${i})">
+        <div class="ock">${state.selIdx === i ? '✓' : ''}</div>
+        <span class="oem">${o.emoji || ''}</span>
+        <div>
+          <div class="otit">${o.title}</div>
+          <div class="odesc">${o.desc}</div>
+          ${o.tag ? `<span class="otag ${o.tag.includes('藥劑') ? 'tp' : o.tag.includes('生物') ? 'tb' : 'tn'}">${o.tag}</span>` : ''}
+        </div>
+      </button>`;
+    });
+  }
+  html += `</div>
+    <div class="custom-row">
+      <input class="custom-inp" id="customInput" type="text" placeholder="或自由输入你的回答...">
+      <button class="custom-send" onclick="sendCustom()">发送 ✨</button>
+    </div>
+  </div>`;
+
+  document.getElementById('qBox').innerHTML = html;
   upBtn();
 }
 
-function pick(i){
-  sel=i;ans[cur]=i;
-  document.querySelectorAll('.ob').forEach((b,idx)=>{
-    b.classList.remove('sb','sp','sn','si');
-    b.querySelector('.ock').textContent='';
-    if(idx===i){
-      const o=QS[cur].opts[i];
-      b.classList.add(o.s.b>o.s.p?'sb':o.s.p>o.s.b?'sp':o.s.it>1?'si':'sn');
-      b.querySelector('.ock').textContent='✓';
+function pickChipClass(chip) {
+  if (/AI|人工智能|科技/.test(chip)) return 'qc-ai';
+  if (/国际|全球|視野/.test(chip)) return 'qc-intl';
+  return 'qc-n';
+}
+
+function pickOption(i) {
+  state.selIdx = i;
+  document.querySelectorAll('.ob').forEach((b, idx) => {
+    b.classList.remove('sb', 'sp', 'sn', 'si');
+    b.querySelector('.ock').textContent = '';
+    if (idx === i) {
+      const o = state.curQ.options[i];
+      b.classList.add(o.tag && o.tag.includes('藥劑') ? 'sp' : o.tag && o.tag.includes('生物') ? 'sb' : 'sn');
+      b.querySelector('.ock').textContent = '✓';
     }
-  });upBtn();
+  });
+  upBtn();
 }
 
-function upBtn(){
-  const b=document.getElementById('nxBtn');
-  if(sel!==null){b.classList.add('on');b.textContent=cur===QS.length-1?'查看分析結果 🎉':'下一題 →';}
-  else b.classList.remove('on');
+async function sendCustom() {
+  const inp = document.getElementById('customInput');
+  const val = inp.value.trim();
+  if (!val) return;
+  inp.value = '';
+  state.messages.push({ role: 'user', content: val });
+  state.answers.push(val);
+  state.curIdx++;
+  if (state.curIdx >= MAX_Q) {
+    await fetchAnalysis();
+    return;
+  }
+  await fetchNextQuestion();
 }
 
-function nextQ(){if(sel===null)return;cur===QS.length-1?showResult():(cur++,sel=ans[cur]!==undefined?ans[cur]:null,renderQ());}
-function prevQ(){if(!cur)return;cur--;sel=ans[cur]!==undefined?ans[cur]:null;renderQ();}
+function upBtn() {
+  const b = document.getElementById('nxBtn');
+  if (state.selIdx !== null) {
+    b.classList.add('on');
+    b.textContent = state.curIdx >= MAX_Q - 1 ? '🎉 查看分析結果' : '下一題 →';
+  } else b.classList.remove('on');
+}
+
+async function nextQ() {
+  if (state.selIdx === null) return;
+  const o = state.curQ.options[state.selIdx];
+  state.messages.push({ role: 'user', content: `我选择: ${o.emoji} ${o.title}` });
+  state.answers.push({ emoji: o.emoji, title: o.title, tag: o.tag });
+  state.curIdx++;
+  if (state.curIdx >= MAX_Q) {
+    await fetchAnalysis();
+    return;
+  }
+  await fetchNextQuestion();
+}
+
+async function prevQ() {
+  if (state.curIdx <= 0) return;
+  state.messages.pop();
+  state.answers.pop();
+  state.curIdx--;
+  state.selIdx = null;
+  await fetchNextQuestion();
+}
+
+async function finishEarly() {
+  if (!confirm('確定要提前結束並查看分析嗎？已答 ' + state.curIdx + ' 題。')) return;
+  await fetchAnalysis();
+}
 
 /* ════ CALC ════ */
 function calc(){

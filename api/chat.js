@@ -78,10 +78,10 @@ export default async function handler(req, res) {
     : '请根据对话历史提出下一个问题，按指定JSON格式返回。';
 
   try {
+    const isAnalyze = mode === 'analyze';
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), isAnalyze ? 60000 : 20000);
 
-    const isAnalyze = mode === 'analyze';
     const model = isAnalyze ? 'deepseek-v4-pro' : 'deepseek-v4-flash';
 
     const body = {

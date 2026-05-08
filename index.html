@@ -248,6 +248,12 @@ body{font-family:'Noto Sans HK',sans-serif;background:var(--bg);color:var(--text
 .end-btn{display:block;width:100%;margin-top:14px;padding:12px;border-radius:50px;border:2px dashed var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .25s}
 .end-btn:hover{border-color:var(--grn);color:var(--grn);background:var(--grn-l)}
 
+/* LOADING */
+.loading-spin{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 0}
+.spinner{width:44px;height:44px;border:4px solid #EEECFA;border-top-color:var(--bio);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{margin-top:16px;font-size:14px;font-weight:700;color:var(--muted)}
+
 .hidden{display:none!important}
 </style>
 </head>
@@ -385,15 +391,23 @@ function startQuiz() {
   state.curIdx = 0;
   state.selIdx = null;
   state.analyzing = false;
+  state.curQ = null;
+  renderQ();
   fetchNextQuestion();
 }
 
 function renderQ() {
   const q = state.curQ;
+  const navEl = document.querySelector('#quiz .nav');
+  const endEl = document.getElementById('endBtn');
   if (!q) {
-    document.getElementById('qBox').innerHTML = '<div class="card"><div class="q-title" style="text-align:center">AI 正在思考...</div><div class="q-sub">請稍候片刻</div></div>';
+    if (navEl) navEl.style.display = 'none';
+    if (endEl) endEl.style.display = 'none';
+    document.getElementById('qBox').innerHTML = '<div class="card"><div class="loading-spin"><div class="spinner"></div><div class="loading-txt">AI 正在思考中...</div></div></div>';
     return;
   }
+  if (navEl) navEl.style.display = '';
+  if (endEl) endEl.style.display = '';
   const pct = Math.round(((state.curIdx + 1) / MAX_Q) * 100);
   document.getElementById('pFill').style.width = pct + '%';
   document.getElementById('pLbl').textContent = `問題 ${state.curIdx + 1} / 最多 ${MAX_Q}`;
@@ -458,6 +472,7 @@ async function sendCustom() {
   const inp = document.getElementById('customInput');
   const val = inp.value.trim();
   if (!val) return;
+  state.curQ = null; renderQ();
   inp.value = '';
   state.messages.push({ role: 'user', content: val });
   state.answers.push(val);
@@ -483,6 +498,7 @@ async function nextQ() {
   state.messages.push({ role: 'user', content: `我选择: ${o.emoji} ${o.title}` });
   state.answers.push({ emoji: o.emoji, title: o.title, tag: o.tag });
   state.curIdx++;
+  state.curQ = null; renderQ();
   if (state.curIdx >= MAX_Q) {
     await fetchAnalysis();
     return;
@@ -496,11 +512,13 @@ async function prevQ() {
   state.answers.pop();
   state.curIdx--;
   state.selIdx = null;
+  state.curQ = null; renderQ();
   await fetchNextQuestion();
 }
 
 async function finishEarly() {
   if (!confirm('確定要提前結束並查看分析嗎？已答 ' + state.curIdx + ' 題。')) return;
+  state.curQ = null; renderQ();
   await fetchAnalysis();
 }
 
